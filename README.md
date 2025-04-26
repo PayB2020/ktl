@@ -6,3 +6,4 @@ env:
    Java 11
    Kafka
    Postgres
+   Docker compose docker-compose.yml
