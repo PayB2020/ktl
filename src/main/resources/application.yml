@@ -1,0 +1,57 @@
+server:
+  port: 8080
+  forward-headers-strategy: framework
+
+spring:
+  application:
+    name: ${APP_NAME:gis-app}
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:45432/bm}
+    username: ${DB_USERNAME:oofm_bm_user}
+    password: ${DB_PASSWORD:oofm_bm_pass}
+ktl:
+  enabled: false
+  notify:
+    enabled: ${NOTIFY_KAFKA_ENABLED:true}
+    ack-topic: gis
+    interval: ${NOTIFY_INTERVAL_SCHEDULER:PT60S}
+    limit: ${NOTIFY_MESSAGE_LIMIT:100} # лимит выборки сообщений из таблицы
+    kafka:
+      bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+      security:
+        protocol: ${KAFKA_SECURITY_PROTOCOL:PLAINTEXT}
+      ssl:
+        trust-store-location: ""
+        trust-store-password: ""
+        #      trust-store-type: ${KAFKA_SSL_TRUSTSTORE_TYPE:PKCS12}
+        key-store-location: ""
+        key-store-password: ""
+      #      key-store-type: ${KAFKA_SSL_KEYSTORE_TYPE:PKCS12}
+      producer:
+        acks: all
+        key-serializer: org.apache.kafka.common.serialization.StringSerializer
+        value-serializer: org.apache.kafka.common.serialization.StringSerializer
+        retries: ${NOTIFY_KAFKA_RETRIES:4}
+        client-id: ${spring.application.name}-notify-streaming-kafka-producer
+        properties:
+          request.timeout.ms: ${NOTIFY_KAFKA_REQUEST_TIMEOUT_MS:30001}
+          delivery.timeout.ms: ${NOTIFY_KAFKA_DELIVERY_TIMEOUT_MS:120001}
+          retry.backoff.ms: ${NOTIFY_KAFKA_RETRY_BACKOFF_MS:10001}
+      consumer:
+        client-id: ${spring.application.name}-notify-streaming-consumer
+        group-id: ${spring.application.name}-notify-streaming-consumers-group
+        key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+        properties:
+          spring.json.trusted.packages: "ru.vtb.msa.oofm.bm"
+      listener:
+        ack-mode: manual
+#  autoconfigure:
+#    exclude:
+#      - org.springframework.boot.autoconfigure.security.oauth2.client.reactive.ReactiveOAuth2ClientAutoConfiguration
+#      - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+#      - org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration
+#  endpoints:
+#    web:
+#      exposure:
+#        include: "*"
