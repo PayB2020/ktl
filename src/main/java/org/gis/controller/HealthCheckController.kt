@@ -9,8 +9,7 @@ import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
-@RestController("/")
-//@ComponentScan("org.gis.*")
+@RestController
 class HealthCheckController(
     private val mainBusinessService: MainBusinessService
 ) {
