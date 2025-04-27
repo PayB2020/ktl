@@ -19,7 +19,7 @@ class HealthCheckController(
 
 
     @GetMapping("/hi")
-    fun getHealthCheck(): ResponseEntity<List<String>> {
+    fun getHealthCheck(): ResponseEntity<List<String>>? {
         return ResponseEntity.ok(mainBusinessService.getData("hi"));
     }
 }

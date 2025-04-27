@@ -1,33 +1,37 @@
 package org.gis.controller
 
+import org.apache.kafka.clients.producer.KafkaProducer
+import org.gis.configuration.WebConfig
 import org.gis.props.KtlProps
-import org.gis.service.MainBusinessService
+import org.gis.service.MainBusinessServiceImpl
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.context.annotation.ComponentScan
+import org.springframework.context.annotation.Import
+import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import javax.sql.DataSource
 
 @WebMvcTest(HealthCheckController::class)
-//@ComponentScan("org.gis")
+@MockBean(KtlProps::class,JdbcTemplate::class, DataSource::class)
+@Import(HealthCheckController::class)
+@ContextConfiguration(classes = [MainBusinessServiceImpl::class, WebConfig::class, HealthCheckController::class])
 class HealthCheckControllerTest {
 
     @Autowired
     private lateinit var mockMvc: MockMvc
 
-
-    @MockBean
-    private lateinit var mainBusinessService: MainBusinessService
-
-    @MockBean
-    private lateinit var ktlProps: KtlProps
-
-
+    @MockBean(name = "notifyStreamingKafkaProducer")
+    private lateinit var kafkaProducer: KafkaProducer<String, String>
     @Test
-    fun myTest() {
-        mockMvc.perform(MockMvcRequestBuilders.post("/hi")).andExpect(status().isMethodNotAllowed())
+    fun `get health check`() {
+
+//        `when`(kafkaProducer.send(any())).thenReturn(Future<RecordMetadata>::get)
+        mockMvc.perform(MockMvcRequestBuilders.get("/hi"))
+            .andExpect(status().isOk())
     }
 }

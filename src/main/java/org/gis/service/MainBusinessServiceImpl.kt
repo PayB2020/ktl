@@ -8,7 +8,8 @@ import org.springframework.stereotype.Service
 import java.util.*
 
 @Service
-class MainBusinessServiceImpl(
+@Qualifier("MainBusinessServiceImpl")
+class MainBusinessServiceImpl (
     private val jdbcTemplate: JdbcTemplate,
     @Qualifier("notifyStreamingKafkaProducer") private val notifyStreamingKafkaProducer: KafkaProducer<String, String>
 
@@ -18,7 +19,7 @@ class MainBusinessServiceImpl(
 //        TODO("Not yet implemented")
         val recordLocal = ProducerRecord("gis", "1", id)
 
-        val send = notifyStreamingKafkaProducer.send(recordLocal);
+        val send = notifyStreamingKafkaProducer.send(recordLocal) ?: return arrayListOf();
         send.get();
         val queryForObject = jdbcTemplate.queryForObject(CHECK_SHK_FOLDER, String::class.java, "oofm-bm")
         println(queryForObject);
