@@ -16,10 +16,8 @@ class MainBusinessServiceImpl (
 
 ) : MainBusinessService {
     override fun getData(id: String): List<String> {
-//        TODO("Not yet implemented")
         val recordLocal = ProducerRecord("gis", "1", id)
-
-        val send = notifyStreamingKafkaProducer.send(recordLocal) ?: return arrayListOf();
+        val send = notifyStreamingKafkaProducer.send(recordLocal);
         send.get();
         val queryForObject = jdbcTemplate.queryForObject(CHECK_SHK_FOLDER, String::class.java, "oofm-bm")
         println(queryForObject);
